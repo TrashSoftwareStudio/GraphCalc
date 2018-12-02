@@ -1,4 +1,4 @@
-package com.trashsoftware.studio.graphcalc;
+package com.trashsoftware.studio.graphcalc.graphics;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -11,6 +11,8 @@ import android.view.MotionEvent;
 import android.view.ScaleGestureDetector;
 import android.view.View;
 
+import com.trashsoftware.studio.graphcalc.GraphActivity;
+import com.trashsoftware.studio.graphcalc.R;
 import com.trashsoftware.studio.graphcalc.maths.Calculus;
 import com.trashsoftware.studio.graphcalc.maths.ExtendedExpressionBuilder;
 import com.trashsoftware.studio.graphcalc.maths.NumberTooLargeException;
@@ -81,9 +83,9 @@ public class CustomView extends View {
 
     private ArrayList<String> parts = new ArrayList<>();
 
-    final static String INTEGRAL_WORD = "integral";
+    public final static String INTEGRAL_WORD = "integral";
 
-    final static String DERIVATIVE_WORD = "ddx";
+    public final static String DERIVATIVE_WORD = "ddx";
 
     private boolean isFirstDraw = true;
 
@@ -91,11 +93,11 @@ public class CustomView extends View {
 
     private double lastTan;
 
-    boolean isRTheta;
+    public static boolean isRTheta;
 
-    double lower;
+    public double lower;
 
-    double upper;
+    public double upper;
 
     public CustomView(Context context, AttributeSet attr) {
         super(context, attr);

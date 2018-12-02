@@ -85,13 +85,13 @@
                         android:tooltipText="@string/bigPiHelp" />
 
                     <Button
-                        android:id="@+id/buttonGraph"
+                        android:id="@+id/buttonRand"
                         style="@style/FunctionButton"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-
-                        android:text="@string/graph" />
+                        android:onClick="generateRandom"
+                        android:text="@string/random" />
 
                 </LinearLayout>
 
@@ -139,13 +139,13 @@
                         android:text="@string/ceil" />
 
                     <Button
-                        android:id="@+id/buttonRand"
+                        android:id="@+id/buttonMod"
                         style="@style/FunctionButton"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:onClick="generateRandom"
-                        android:text="@string/random" />
+                        android:onClick="inputNormal"
+                        android:text="@string/mod" />
 
                 </LinearLayout>
 

@@ -7,10 +7,9 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
-import android.widget.CompoundButton;
-import android.widget.Switch;
 import android.widget.TextView;
 
+import com.trashsoftware.studio.graphcalc.graphics.CustomView;
 import com.trashsoftware.studio.graphcalc.util.GraphUnit;
 
 public class GraphActivity extends AppCompatActivity
@@ -21,6 +20,7 @@ public class GraphActivity extends AppCompatActivity
     private TextView text;
     private String xyString;
     private String rThetaString;
+    private MenuItem polarItem;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +31,12 @@ public class GraphActivity extends AppCompatActivity
 
         NavigationView navigationView = findViewById(R.id.nav_view_graph);
         navigationView.setNavigationItemSelectedListener(this);
+        polarItem = navigationView.getMenu().findItem(R.id.nav_rTheta);
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
     }
 
     @Override
@@ -40,13 +46,13 @@ public class GraphActivity extends AppCompatActivity
 
         if (id == R.id.nav_rTheta) {
 //            MenuItem polarItem = findViewById(R.id.nav_rTheta);
-            view.isRTheta = !view.isRTheta;
-            if (view.isRTheta) {
+            CustomView.isRTheta = !CustomView.isRTheta;
+            if (CustomView.isRTheta) {
                 text.setText(rThetaString);
-//                polarItem.setTitle(R.string.cartesian);
+                polarItem.setTitle(R.string.cartesian);
             } else {
                 text.setText(xyString);
-//                polarItem.setTitle(R.string.polar);
+                polarItem.setTitle(R.string.polar);
             }
             view.invalidate();
         }
@@ -59,12 +65,9 @@ public class GraphActivity extends AppCompatActivity
 
     private void initialize() {
         text = findViewById(R.id.equationText);
-
         graphUnit = (GraphUnit) getIntent().getSerializableExtra(MainActivity.UNIT_KEY);
-
         xyString = "y = " + graphUnit.equationShowing;
         text.setText(xyString);
-
         String thetaEquation = graphUnit.equationShowing.replaceAll("x", "θ");
         rThetaString = "r = " + thetaEquation;
 

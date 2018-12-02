@@ -2,6 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:layout_above="@+id/nav_view"
     android:orientation="vertical">
 
     <LinearLayout
@@ -15,6 +16,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="memorySave"
+            android:enabled="false"
             android:text="@string/mSave" />
 
         <Button
@@ -23,6 +26,8 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="memoryRecall"
+            android:enabled="false"
             android:text="@string/mRecall" />
 
         <Button
@@ -31,16 +36,25 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
+            android:onClick="memoryClear"
+            android:enabled="false"
             android:text="@string/mClear" />
 
     </LinearLayout>
 
-
-    <ListView
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/memory_list"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="0.7">
+        android:layout_height="wrap_content">
 
-    </ListView>
+    </android.support.v7.widget.RecyclerView>
+
+    <!--<ListView-->
+    <!--android:id="@+id/memory_list"-->
+
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+    <!--</ListView>-->
 
 </LinearLayout>

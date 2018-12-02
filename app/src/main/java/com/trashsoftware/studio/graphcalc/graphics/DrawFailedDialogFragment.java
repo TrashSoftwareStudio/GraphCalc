@@ -1,4 +1,4 @@
-package com.trashsoftware.studio.graphcalc;
+package com.trashsoftware.studio.graphcalc.graphics;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -6,6 +6,9 @@ import android.content.DialogInterface;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.DialogFragment;
+
+import com.trashsoftware.studio.graphcalc.GraphActivity;
+import com.trashsoftware.studio.graphcalc.R;
 
 import java.util.Objects;
 

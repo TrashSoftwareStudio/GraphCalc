@@ -1,7 +1,7 @@
 <resources>
     <string name="app_name">GraphCalc</string>
 
-    <string name="action_settings"></string>
+    <!--<string name="action_settings">Settings</string>-->
 
     <string name="settings">Settings</string>
     <string name="help">Help</string>
@@ -9,6 +9,8 @@
     <string name="mSave">MS</string>
     <string name="mRecall">MR</string>
     <string name="mClear">MC</string>
+    <string name="mPlus">M+</string>
+    <string name="mMinus">M-</string>
 
     <!--Buttons-->
     <string name="n1">1</string>
@@ -74,6 +76,8 @@
     <string name="root">√</string>
     <string name="random">Rand</string>
 
+    <string name="mod">Mod</string>
+
     <!--Graph UI-->
     <string name="polar">Polar</string>
     <string name="cartesian">Cartesian</string>
@@ -90,17 +94,17 @@
     <string name="tooLarge">Number too large</string>
 
     <!--Helpers-->
-    <string name="ddxHelp">Derivative: d/dx(f(x),point)
+    <string name="ddxHelp">Derivative: d/dx(f(x),point)\n
     Differential function graph: d/dx(f(x))</string>
 
-    <string name="integralHelp">Definite integral: ∫(f(x),lower,upper)
+    <string name="integralHelp">Definite integral: ∫(f(x),lower,upper)\n
     Indefinite integral graph: ∫(f(x))</string>
 
     <string name="sigmaHelp">∑(f(x),lower,upper)</string>
 
     <string name="bigPiHelp">∏(f(x),lower,upper)</string>
 
-    <string name="rootHelp">Square root: √(x)
+    <string name="rootHelp">Square root: √(x)\n
     Root of n: √(n,x)</string>
 
     <string name="logHelp">log(base,power)</string>

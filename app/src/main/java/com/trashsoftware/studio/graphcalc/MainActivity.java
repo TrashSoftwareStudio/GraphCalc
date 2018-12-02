@@ -4,23 +4,26 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.TooltipCompat;
 import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
-import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
+import com.trashsoftware.studio.graphcalc.graphics.CustomView;
+import com.trashsoftware.studio.graphcalc.graphics.MemoryAdapter;
 import com.trashsoftware.studio.graphcalc.maths.Calculus;
 import com.trashsoftware.studio.graphcalc.maths.ExtendedExpressionBuilder;
 import com.trashsoftware.studio.graphcalc.maths.NumberTooLargeException;
@@ -28,6 +31,8 @@ import com.trashsoftware.studio.graphcalc.util.GraphUnit;
 import com.trashsoftware.studio.graphcalc.util.Util;
 
 import net.objecthunter.exp4j.Expression;
+
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener {
@@ -39,7 +44,8 @@ public class MainActivity extends AppCompatActivity
     };
 
     private final static String[][] normalSubstitutions = new String[][]{
-            new String[]{"π", "pi"}
+            new String[]{"π", "pi"},
+            new String[]{"Mod", "%"}
     };
 
     public final static String INTEGRAL_SIGN = "∫";
@@ -47,6 +53,8 @@ public class MainActivity extends AppCompatActivity
     public final static String COMMA_SIGN = ",";
 
     final static String UNIT_KEY = "UNIT_KEY";
+
+    final static String MEMORY_KEY = "MEMORY_RESULT";
 
     final static String EQUATION_TEXT_KEY = "EQUATION_TEXT";
 
@@ -66,20 +74,25 @@ public class MainActivity extends AppCompatActivity
 
     private int lastRandIndex = -1;
 
+    private MemoryAdapter memoryAdapter2;
+
+    private double currentResult;
+
+    private NavigationView navigationView;
+
+    private Button msBtn, mrBtn, mcBtn;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        NavigationView navigationView = findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-
-        initialize();
+        initialize(savedInstanceState);
     }
 
     @Override
     public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
         if (drawer.isDrawerOpen(GravityCompat.START)) {
             drawer.closeDrawer(GravityCompat.START);
         } else {
@@ -105,7 +118,36 @@ public class MainActivity extends AppCompatActivity
         return true;
     }
 
-    private void initialize() {
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        outState.putStringArrayList(MEMORY_KEY, memoryAdapter2.dataSet);
+        outState.putString(RESULT_KEY, number2.getText().toString());
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+
+        if (savedInstanceState != null) {
+            if (savedInstanceState.containsKey(RESULT_KEY)) {
+                number2.setText(savedInstanceState.getString(RESULT_KEY));
+            } else {
+                msBtn.setEnabled(false);
+            }
+        } else {
+            msBtn.setEnabled(false);
+        }
+    }
+
+    private void initialize(Bundle savedInstanceState) {
+        navigationView = findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+        msBtn = navigationView.getHeaderView(0).findViewById(R.id.button_m_save);
+        mrBtn = navigationView.getHeaderView(0).findViewById(R.id.button_m_recall);
+        mcBtn = navigationView.getHeaderView(0).findViewById(R.id.button_m_clear);
+
         number2 = findViewById(R.id.number2);
         editText = findViewById(R.id.editText);
         editText.setShowSoftInputOnFocus(false);
@@ -115,9 +157,55 @@ public class MainActivity extends AppCompatActivity
         tanBtn = findViewById(R.id.buttonTan);
         radDegBtn = findViewById(R.id.buttonDeg);
 
+        ArrayList<String> list;
+        if (savedInstanceState != null) {
+            list = savedInstanceState.getStringArrayList(MEMORY_KEY);
+            if (list != null && list.size() > 0) {
+                mrBtn.setEnabled(true);
+                mcBtn.setEnabled(true);
+            } else {
+                list = new ArrayList<>();
+            }
+        } else {
+            list = new ArrayList<>();
+        }
+        initRecyclerView(list);
+
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
             setLongClickListeners();
         }
+
+        setNumber2Listener();
+    }
+
+    private void initRecyclerView(ArrayList<String> strings) {
+        RecyclerView memoryList = navigationView.getHeaderView(0).findViewById(R.id.memory_list);
+        memoryList.setLayoutManager(new LinearLayoutManager(this));
+        memoryAdapter2 = new MemoryAdapter(this, strings);
+        memoryList.setAdapter(memoryAdapter2);
+    }
+
+    private void setNumber2Listener() {
+        number2.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void beforeTextChanged(CharSequence s, int start, int count, int after) {
+
+            }
+
+            @Override
+            public void onTextChanged(CharSequence s, int start, int before, int count) {
+                if (s.length() == 0) {
+                    msBtn.setEnabled(false);
+                } else {
+                    msBtn.setEnabled(true);
+                }
+            }
+
+            @Override
+            public void afterTextChanged(Editable s) {
+
+            }
+        });
     }
 
     private void drawGraphAction() {
@@ -125,6 +213,29 @@ public class MainActivity extends AppCompatActivity
         Intent intent = new Intent(this, GraphActivity.class);
         intent.putExtra(UNIT_KEY, gu);
         startActivity(intent);
+    }
+
+    public void memorySave(View view) {
+        String text = number2.getText().toString();
+        if (text.length() > 0) {
+            memoryAdapter2.dataSet.add(number2.getText().toString());
+            memoryAdapter2.notifyItemInserted(memoryAdapter2.dataSet.size() - 1);
+            mrBtn.setEnabled(true);
+            mcBtn.setEnabled(true);
+        }
+    }
+
+    public void memoryRecall(View view) {
+        if (memoryAdapter2.getItemCount() > 0) {
+            inputText(memoryAdapter2.dataSet.get(0));
+        }
+    }
+
+    public void memoryClear(View view) {
+        memoryAdapter2.dataSet.clear();
+        memoryAdapter2.notifyDataSetChanged();
+        mrBtn.setEnabled(false);
+        mcBtn.setEnabled(false);
     }
 
     public void inputNormal(View view) {
@@ -221,8 +332,8 @@ public class MainActivity extends AppCompatActivity
         try {
             String text = getEquation();
             Expression ex = new ExtendedExpressionBuilder(text).build();
-            double result = ex.evaluate();
-            String textResult = Util.doubleToString(result);
+            currentResult = ex.evaluate();
+            String textResult = Util.doubleToString(currentResult);
             number2.setText(textResult);
         } catch (NumberTooLargeException nte) {
             number2.setText(R.string.tooLarge);
@@ -232,7 +343,7 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
-    private void inputText(CharSequence text) {
+    public void inputText(CharSequence text) {
         Editable current = editText.getText();
         current.replace(editText.getSelectionStart(), editText.getSelectionEnd(), text);
         lastRandIndex = -1;
@@ -254,7 +365,6 @@ public class MainActivity extends AppCompatActivity
         while ((derivativeIndex = s.indexOf("d/dx(")) != -1) {
             s = parseDerivative(s, derivativeIndex);
         }
-//        System.out.println(s);
         return s;
     }
 
@@ -284,8 +394,7 @@ public class MainActivity extends AppCompatActivity
             double roundedResult = (double) Math.round(result * 1_000_000) / 1_000_000;
             return front + String.valueOf(roundedResult) + back;
         } else {
-            return null;
-//            return front + CustomView.INTEGRAL_WORD + "(" + integral + ")dx" + back;
+            return front + CustomView.INTEGRAL_WORD + "(" + integral + ")dx" + back;
         }
     }
 
