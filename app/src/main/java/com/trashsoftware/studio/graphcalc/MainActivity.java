@@ -229,7 +229,7 @@ public class MainActivity extends AppCompatActivity
 
             @Override
             public void onTextChanged(CharSequence s, int start, int before, int count) {
-                if (s.length() == 0) {
+                if (s.length() == 0 || s.toString().equals(getString(R.string.error))) {
                     msBtn.setEnabled(false);
                 } else {
                     msBtn.setEnabled(true);
