@@ -253,7 +253,7 @@ public class MainActivity extends AppCompatActivity
 
     public void memorySave(View view) {
         String text = number2.getText().toString();
-        if (text.length() > 0) {
+        if (text.length() > 0 && !text.equals(getString(R.string.error))) {
             memoryAdapter2.dataSet.add(number2.getText().toString());
             memoryAdapter2.notifyItemInserted(memoryAdapter2.dataSet.size() - 1);
             mrBtn.setEnabled(true);
