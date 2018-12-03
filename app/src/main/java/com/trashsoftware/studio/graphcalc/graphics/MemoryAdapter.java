@@ -9,6 +9,7 @@ import android.widget.TextView;
 
 import com.trashsoftware.studio.graphcalc.MainActivity;
 import com.trashsoftware.studio.graphcalc.R;
+import com.trashsoftware.studio.graphcalc.util.Util;
 
 import java.util.ArrayList;
 
@@ -36,7 +37,9 @@ public class MemoryAdapter extends RecyclerView.Adapter<MemoryAdapter.MemoryView
 
         @Override
         public void onClick(View v) {
-            activity.inputText(textView.getText());
+            String s = Util.parseDoubleString(textView.getText().toString());
+            activity.inputText(s);
+            activity.closeDrawer();
         }
     }
 

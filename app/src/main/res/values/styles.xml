@@ -38,7 +38,7 @@
     <style name="MemoryButton" parent="Widget.AppCompat.Button.Borderless">
         <item name="android:textAllCaps">false</item>
         <!--<item name="android:background">@color/colorPrimary</item>-->
-        <item name="android:foreground">?attr/selectableItemBackgroundBorderless</item>
+        <!--<item name="android:foreground">?attr/selectableItemBackgroundBorderless</item>-->
     </style>
 
     <style name="AppTheme.NoActionBar">

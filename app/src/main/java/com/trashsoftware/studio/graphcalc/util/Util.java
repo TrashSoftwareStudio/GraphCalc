@@ -2,6 +2,7 @@ package com.trashsoftware.studio.graphcalc.util;
 
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
 import java.util.Locale;
 
 public class Util {
@@ -24,7 +25,7 @@ public class Util {
             double fractional = d - decimal;
 //            System.out.println(fractional);
 //            System.out.println();
-            String decimalString = NumberFormat.getNumberInstance(Locale.US).format(decimal);
+            String decimalString = NumberFormat.getNumberInstance().format(decimal);
             if (Math.abs(fractional) <= 0.1E-15) {
                 return decimalString;
             } else {
@@ -35,6 +36,18 @@ public class Util {
 //                System.out.println(fractionalString);
                 return decimalString + fractionalString;
             }
+        }
+    }
+
+    public static String parseDoubleString(String s) {
+        NumberFormat format = NumberFormat.getInstance();
+
+        try {
+            Number number = format.parse(s);
+            return String.valueOf(number);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            throw new ArithmeticException("Cannot parse string");
         }
     }
 }

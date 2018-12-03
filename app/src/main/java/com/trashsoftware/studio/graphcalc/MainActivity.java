@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.TooltipCompat;
 import android.support.v7.widget.helper.ItemTouchHelper;
@@ -19,11 +18,8 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.view.MenuItem;
-import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.trashsoftware.studio.graphcalc.graphics.CustomView;
@@ -32,7 +28,6 @@ import com.trashsoftware.studio.graphcalc.maths.Calculus;
 import com.trashsoftware.studio.graphcalc.maths.ExtendedExpressionBuilder;
 import com.trashsoftware.studio.graphcalc.maths.NumberTooLargeException;
 import com.trashsoftware.studio.graphcalc.util.GraphUnit;
-import com.trashsoftware.studio.graphcalc.util.SavedEquation;
 import com.trashsoftware.studio.graphcalc.util.Util;
 
 import net.objecthunter.exp4j.Expression;
@@ -80,8 +75,6 @@ public class MainActivity extends AppCompatActivity
     private int lastRandIndex = -1;
 
     private MemoryAdapter memoryAdapter2;
-
-    private double currentResult;
 
     private NavigationView navigationView;
 
@@ -132,8 +125,7 @@ public class MainActivity extends AppCompatActivity
 
         }
 
-        DrawerLayout drawer = findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
+        closeDrawer();
         return true;
     }
 
@@ -158,6 +150,11 @@ public class MainActivity extends AppCompatActivity
         } else {
             msBtn.setEnabled(false);
         }
+    }
+
+    public void closeDrawer() {
+        DrawerLayout drawer = findViewById(R.id.drawer_layout);
+        drawer.closeDrawer(GravityCompat.START);
     }
 
     private void initialize(Bundle savedInstanceState) {
@@ -265,8 +262,11 @@ public class MainActivity extends AppCompatActivity
     }
 
     public void memoryRecall(View view) {
-        if (memoryAdapter2.getItemCount() > 0) {
-            inputText(memoryAdapter2.dataSet.get(0));
+        int itemCount = memoryAdapter2.getItemCount();
+        if (itemCount > 0) {
+            String s = Util.parseDoubleString(memoryAdapter2.dataSet.get(itemCount - 1));
+            inputText(s);
+            closeDrawer();
         }
     }
 
@@ -275,6 +275,7 @@ public class MainActivity extends AppCompatActivity
         memoryAdapter2.notifyDataSetChanged();
         mrBtn.setEnabled(false);
         mcBtn.setEnabled(false);
+        closeDrawer();
     }
 
     public void inputNormal(View view) {
@@ -371,7 +372,7 @@ public class MainActivity extends AppCompatActivity
         try {
             String text = getEquation();
             Expression ex = new ExtendedExpressionBuilder(text).build();
-            currentResult = ex.evaluate();
+            double currentResult = ex.evaluate();
             String textResult = Util.doubleToString(currentResult);
             number2.setText(textResult);
         } catch (NumberTooLargeException nte) {
