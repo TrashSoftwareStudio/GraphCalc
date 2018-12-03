@@ -12,7 +12,7 @@
 
         <Button
             android:id="@+id/button_m_save"
-            style="@style/NumberButton"
+            style="@style/MemoryButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -22,7 +22,7 @@
 
         <Button
             android:id="@+id/button_m_recall"
-            style="@style/NumberButton"
+            style="@style/MemoryButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
@@ -32,7 +32,7 @@
 
         <Button
             android:id="@+id/button_m_clear"
-            style="@style/NumberButton"
+            style="@style/MemoryButton"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"

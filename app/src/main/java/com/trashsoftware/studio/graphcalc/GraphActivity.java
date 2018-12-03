@@ -12,8 +12,10 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.trashsoftware.studio.graphcalc.graphics.CustomView;
@@ -31,9 +33,8 @@ public class GraphActivity extends AppCompatActivity
 
     public GraphUnit graphUnit;
     private CustomView view;
-//    private TextView text;
-//    private MenuItem polarItem;
     private NavigationView navigationView;
+    private Button clearBtn;
     GraphAdapter graphAdapter;
 
     @Override
@@ -78,7 +79,7 @@ public class GraphActivity extends AppCompatActivity
 
         int id = menuItem.getItemId();
 
-        if (id == R.id.nav_rTheta) {
+//        if (id == R.id.nav_rTheta) {
 //            CustomView.isRTheta = !CustomView.isRTheta;
 //            text.setText(graphUnit.getEquationShowing(CustomView.isRTheta));
 //            if (CustomView.isRTheta) {
@@ -87,7 +88,7 @@ public class GraphActivity extends AppCompatActivity
 //                polarItem.setTitle(R.string.polar);
 //            }
 //            view.invalidate();
-        }
+//        }
 
         DrawerLayout drawer = findViewById(R.id.drawer_layout_graph);
         drawer.closeDrawer(GravityCompat.START);
@@ -138,21 +139,43 @@ public class GraphActivity extends AppCompatActivity
     }
 
     private void initRecyclerView(ArrayList<SavedEquation> ses) {
+        clearBtn = navigationView.getHeaderView(0).findViewById(R.id.button_graph_clear);
+
         RecyclerView graphList = navigationView.getHeaderView(0).findViewById(R.id.graph_list);
         graphList.setLayoutManager(new GridLayoutManager(this, 1));
         graphAdapter = new GraphAdapter(this, ses);
         graphList.setAdapter(graphAdapter);
+
+        ItemTouchHelper ith = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                if (graphAdapter.removeItem((GraphAdapter.GraphViewHolder) viewHolder)) {
+                    graphAdapter.notifyDataSetChanged();
+                    if (graphAdapter.dataSet.size() == 0) {
+                        clearBtn.setEnabled(false);
+                    }
+                    view.invalidate();
+                }
+            }
+        });
+        ith.attachToRecyclerView(graphList);
     }
 
     private void drawGraph() {
         view = findViewById(R.id.customView);
         view.setGraphs(graphAdapter, graphUnit);
-//        view.setEquation(graphUnit.equation);
-//        view.lower = graphUnit.lower;
-//        view.upper = graphUnit.upper;
     }
 
     public void graphClear(View view) {
-
+        clearBtn.setEnabled(false);
+        graphAdapter.dataSet.clear();
+        graphAdapter.notifyDataSetChanged();
+        view.invalidate();
+        onBackPressed();
     }
 }

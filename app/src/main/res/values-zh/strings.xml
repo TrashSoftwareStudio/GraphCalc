@@ -1,17 +1,17 @@
 <resources>
-    <string name="app_name">GraphCalc</string>
+    <string name="app_name">图形计算器</string>
 
     <!--<string name="action_settings">Settings</string>-->
 
-    <string name="settings">Settings</string>
-    <string name="help">Help</string>
+    <string name="settings">设置</string>
+    <string name="help">帮助</string>
 
     <string name="mSave">MS</string>
     <string name="mRecall">MR</string>
     <string name="mClear">MC</string>
     <string name="mPlus">M+</string>
     <string name="mMinus">M-</string>
-    <string name="clear_full">Clear</string>
+    <string name="clear_full">清除</string>
 
     <!--Buttons-->
     <string name="n1">1</string>
@@ -80,26 +80,26 @@
     <string name="mod">Mod</string>
 
     <!--Menu bar-->
-    <string name="cartesian_graph">Cartesian Graph</string>
-    <string name="polar_graph">Polar Graph</string>
+    <string name="cartesian_graph">平面直角图像</string>
+    <string name="polar_graph">极坐标图像</string>
 
-    <string name="drawFailed">Failed to draw graph</string>
-    <string name="noLimit">Please specify the domain</string>
-    <string name="ok">OK</string>
-    <string name="error">Error</string>
-    <string name="tooLarge">Number too large</string>
+    <string name="drawFailed">无法生成图像</string>
+    <string name="noLimit">请输入定义域</string>
+    <string name="ok">确认</string>
+    <string name="error">错误</string>
+    <string name="tooLarge">数字太大</string>
 
     <!--Helpers-->
-    <string name="ddxHelp">Derivative: d/dx(f(x),point)\nDifferential function graph: d/dx(f(x))</string>
+    <string name="ddxHelp">求导: d/dx(f(x),点)\n微分方程图像: d/dx(f(x))</string>
 
-    <string name="integralHelp">Definite integral: ∫(f(x),lower,upper)\nIndefinite integral graph: ∫(f(x))</string>
+    <string name="integralHelp">定积分: ∫(f(x),下限,上限)\n不定积分图像: ∫(f(x))</string>
 
-    <string name="sigmaHelp">∑(f(x),lower,upper)</string>
+    <string name="sigmaHelp">∑(f(x),下限,上限)</string>
 
-    <string name="bigPiHelp">∏(f(x),lower,upper)</string>
+    <string name="bigPiHelp">∏(f(x),下限,上限)</string>
 
-    <string name="rootHelp">Square root: √(x)\nRoot of n: √(n,x)</string>
+    <string name="rootHelp">平方根: √(x)\nn次方根: √(n,x)</string>
 
-    <string name="logHelp">log(base,power)</string>
+    <string name="logHelp">log(底数,真数)</string>
 
 </resources>
