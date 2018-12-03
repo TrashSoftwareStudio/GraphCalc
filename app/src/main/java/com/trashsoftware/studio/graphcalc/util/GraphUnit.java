@@ -16,20 +16,28 @@ public class GraphUnit implements Serializable {
 
     public String equation;
 
-    public String equationShowing;
+    private String equationShowing;
+
+    public boolean polar;
 
     public double lower = MIN_VALUE;
 
     public double upper = MAX_VALUE;
 
-    public GraphUnit(MainActivity parent, String equationText) {
+    public GraphUnit(MainActivity parent, String equationText, boolean polar) {
         String[] parts = parse(equationText);
         equation = parent.parse(parts[0]);
-        equationShowing = parts[0];
+        equationShowing = "y = " + parts[0];
+        this.polar = polar;
         if (parts.length == 3) {
             lower = new ExtendedExpressionBuilder(parts[1]).build().evaluate();
             upper = new ExtendedExpressionBuilder(parts[2]).build().evaluate();
         }
+    }
+
+    public String getEquationShowing() {
+        if (polar) return equationShowing.replaceAll("x", "θ").replaceAll("y","r");
+        return equationShowing;
     }
 
     private static String[] parse(String equationText) {
@@ -58,7 +66,6 @@ public class GraphUnit implements Serializable {
         }
     }
 
-//    @androidx.annotation.NonNull
     @NonNull
     @Override
     public String toString() {

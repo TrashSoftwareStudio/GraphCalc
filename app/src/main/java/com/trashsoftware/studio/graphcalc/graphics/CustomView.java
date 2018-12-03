@@ -17,6 +17,7 @@ import com.trashsoftware.studio.graphcalc.maths.Calculus;
 import com.trashsoftware.studio.graphcalc.maths.ExtendedExpressionBuilder;
 import com.trashsoftware.studio.graphcalc.maths.NumberTooLargeException;
 import com.trashsoftware.studio.graphcalc.util.GraphUnit;
+import com.trashsoftware.studio.graphcalc.util.SavedEquation;
 
 import net.objecthunter.exp4j.Expression;
 
@@ -25,6 +26,9 @@ import java.util.ArrayList;
 import static android.view.MotionEvent.INVALID_POINTER_ID;
 
 public class CustomView extends View {
+
+    public final static int[] COLORS = new int[]{Color.BLUE, Color.RED, Color.GREEN, Color.YELLOW,
+            Color.CYAN};
 
     private final static int INTERVAL = 2;
 
@@ -70,15 +74,17 @@ public class CustomView extends View {
 
     private DrawFailedDialogFragment dialogFragment = new DrawFailedDialogFragment();
 
-    private String equation;
+    public GraphAdapter graphAdapter;
+
+//    private String equation;
 
     private float lastTouchX, lastTouchY;
 
     private int activePointerId;
 
-    private boolean hasCalculus;
+//    private boolean hasCalculus;
 
-    private ArrayList<String> parts = new ArrayList<>();
+//    private ArrayList<String> parts = new ArrayList<>();
 
     public final static String INTEGRAL_WORD = "integral";
 
@@ -90,11 +96,13 @@ public class CustomView extends View {
 
     private double lastTan;
 
-    public static boolean isRTheta;
+//    public static boolean isRTheta;
 
-    public double lower;
+//    public double lower;
+//
+//    public double upper;
 
-    public double upper;
+//    public ArrayList<SavedEquation> extraEquations;
 
     public CustomView(Context context, AttributeSet attr) {
         super(context, attr);
@@ -118,7 +126,7 @@ public class CustomView extends View {
 
         axisPaint.setColor(Color.BLACK);
         axisPaint.setStrokeWidth(6);
-        curvePaint.setColor(Color.BLUE);
+        curvePaint.setColor(COLORS[0]);
         curvePaint.setStrokeWidth(6);
         dashPaint.setColor(Color.GRAY);
         dashPaint.setStrokeWidth(3);
@@ -137,21 +145,57 @@ public class CustomView extends View {
         scaleDetector = new ScaleGestureDetector(context, new ScaleListener());
     }
 
-    public void setEquation(String equationParsed) {
-        equation = equationParsed;
-        if (equation.contains(INTEGRAL_WORD)) {
-            parseIndefiniteIntegral();
+    public void setGraphs(GraphAdapter graphAdapter, GraphUnit graphUnit) {
+        this.graphAdapter = graphAdapter;
+        String equationParsed = graphUnit.equation;
+        boolean hasCalculus = false;
+        ArrayList<String> parts = new ArrayList<>();
+        if (equationParsed.contains(INTEGRAL_WORD)) {
+            parseIndefiniteIntegral(equationParsed, parts);
             hasCalculus = true;
             interval = INTEGRAL_INTERVAL;
         } else {
             interval = INTERVAL;
         }
-        if (equation.contains(DERIVATIVE_WORD)) {
-            parseIndefiniteDerivative();
+        if (equationParsed.contains(DERIVATIVE_WORD)) {
+            parts = parseIndefiniteDerivative(parts, equationParsed, hasCalculus);
             // Keep this boolean value after the above line !!!
             hasCalculus = true;
         }
+        SavedEquation se;
+        if (hasCalculus) {
+            se = new SavedEquation(parts, graphUnit.getEquationShowing(), graphUnit.polar, graphUnit.lower, graphUnit.upper);
+        } else {
+            se = new SavedEquation(equationParsed, graphUnit.getEquationShowing(), graphUnit.polar, graphUnit.lower, graphUnit.upper);
+        }
+        graphAdapter.dataSet.add(se);
+        graphAdapter.notifyItemInserted(graphAdapter.dataSet.size() - 1);
+        invalidate();
     }
+
+//    public void setEquation(String equationParsed) {
+//        equation = equationParsed;
+//        if (equation.contains(INTEGRAL_WORD)) {
+//            parseIndefiniteIntegral();
+//            hasCalculus = true;
+//            interval = INTEGRAL_INTERVAL;
+//        } else {
+//            interval = INTERVAL;
+//        }
+//        if (equation.contains(DERIVATIVE_WORD)) {
+//            parseIndefiniteDerivative();
+//            // Keep this boolean value after the above line !!!
+//            hasCalculus = true;
+//        }
+//    }
+
+//    public SavedEquation getCurrentEquation() {
+//        if (hasCalculus) {
+//            return new SavedEquation(parts, context.graphUnit.getEquationShowing(isRTheta), isRTheta);
+//        } else {
+//            return new SavedEquation(equation, context.graphUnit.getEquationShowing(isRTheta), isRTheta);
+//        }
+//    }
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
@@ -220,21 +264,21 @@ public class CustomView extends View {
         return true;
     }
 
-    private double[][] calculatePolar() {
-        if (lower == GraphUnit.MIN_VALUE || upper == GraphUnit.MAX_VALUE) {
+    private double[][] calculatePolar(SavedEquation se) {
+        if (se.lower == GraphUnit.MIN_VALUE || se.upper == GraphUnit.MAX_VALUE) {
             throw new NumberTooLargeException();
         }
-        double[][] points = new double[(int) ((upper - lower) / POLAR_INTERVAL) + 2][];
+        double[][] points = new double[(int) ((se.upper - se.lower) / POLAR_INTERVAL) + 2][];
 
         int index = 0;
-        if (hasCalculus) {
+        if (se.hasCalculus) {
 
         } else {
-            Expression ex = new ExtendedExpressionBuilder(equation).variable("x").build();
+            Expression ex = new ExtendedExpressionBuilder(se.equation).variable("x").build();
 
-            for (double theta = lower; theta < upper + POLAR_INTERVAL; theta += POLAR_INTERVAL) {
-                if (theta > upper) {
-                    ex.setVariable("x", upper);
+            for (double theta = se.lower; theta < se.upper + POLAR_INTERVAL; theta += POLAR_INTERVAL) {
+                if (theta > se.upper) {
+                    ex.setVariable("x", se.upper);
                 } else {
                     ex.setVariable("x", theta);
                 }
@@ -259,36 +303,33 @@ public class CustomView extends View {
         return points;
     }
 
-    private double[][] calculate() {
+    private double[][] calculate(SavedEquation se) {
         double[][] points = new double[(int) screenWidth / interval][];
-        if (hasCalculus) {
+        if (se.hasCalculus) {
             int index = 0;
             for (float screenX = 0; screenX < screenWidth; screenX += interval) {
                 double x = getNumberX(screenX);
-                if (x < lower || x > upper) {
+                if (x < se.lower || x > se.upper) {
                     points[index++] = new double[]{Double.MAX_VALUE, Double.MAX_VALUE};
                     continue;
                 }
                 double y;
                 try {
-                    y = calculateIntegral(x);
+                    y = calculateIntegral(x, se.parts);
                 } catch (ArithmeticException | IllegalArgumentException ae) {
                     y = Double.MAX_VALUE;
                 }
                 points[index++] = new double[]{x, y};
             }
         } else {
-            Expression ex = new ExtendedExpressionBuilder(equation).variable("x").build();
+            Expression ex = new ExtendedExpressionBuilder(se.equation).variable("x").build();
             int index = 0;
             for (float screenX = 0; screenX < screenWidth; screenX += interval) {
                 double x = getNumberX(screenX);
-//                System.out.println((x < lower) + " " + lower);
-                if (x < lower || x > upper) {
-//                    System.out.println("我日你妈");
+                if (x < se.lower || x > se.upper) {
                     points[index++] = new double[]{Double.MAX_VALUE, Double.MAX_VALUE};
                     continue;
                 }
-//                System.out.println(x);
                 ex.setVariable("x", x);
                 double y;
                 try {
@@ -299,13 +340,12 @@ public class CustomView extends View {
                 points[index++] = new double[]{x, y};
             }
         }
-//        System.out.println("succeed3");
         return points;
     }
 
-    private double calculateIntegral(double x) {
+    private double calculateIntegral(double x, ArrayList<String> singleParts) {
         StringBuilder sb = new StringBuilder();
-        for (String s : parts) {
+        for (String s : singleParts) {
             if (s.contains(INTEGRAL_WORD)) {
                 double low;
                 double up;
@@ -325,7 +365,6 @@ public class CustomView extends View {
                 String de = s.substring(4);
                 double res = Calculus.definiteDerivative(x, 0.000_000_1, de);
                 sb.append(String.valueOf(res));
-//                sb.append(calculateDerivativeNested(s, x));
             } else {
                 sb.append(s);
             }
@@ -343,7 +382,7 @@ public class CustomView extends View {
         return (heightCenter - screenY) / scalar;
     }
 
-    private void drawOnePoint(double numberX, double numberY, Canvas canvas) {
+    private void drawOnePoint(double numberX, double numberY, boolean isRTheta, Canvas canvas) {
         if (numberY == Double.MAX_VALUE) {
             lastX = 0;
             lastY = 0;
@@ -429,18 +468,21 @@ public class CustomView extends View {
 
         // Draw curve
         try {
-            lastX = 0;
-            lastY = 0;
-            double[][] points;
-            if (isRTheta) {
-//                System.out.println(11111);
-                points = calculatePolar();
-//                System.out.println(22222);
-            } else {
-                points = calculate();
-            }
-            for (double[] point : points) {
-                drawOnePoint(point[0], point[1], canvas);
+            int colorIndex = 0;
+            for (SavedEquation se : graphAdapter.dataSet) {
+                lastX = 0;
+                lastY = 0;
+                double[][] points;
+                if (se.isPolar) {
+                    points = calculatePolar(se);
+                } else {
+                    points = calculate(se);
+                }
+                curvePaint.setColor(COLORS[colorIndex % COLORS.length]);
+                colorIndex++;
+                for (double[] point : points) {
+                    drawOnePoint(point[0], point[1], se.isPolar, canvas);
+                }
             }
         } catch (NumberTooLargeException ntl) {
             showCannotDrawDialog(R.string.noLimit);
@@ -467,9 +509,8 @@ public class CustomView extends View {
         }
     }
 
-    private void parseIndefiniteIntegral() {
+    private void parseIndefiniteIntegral(String s, ArrayList<String> parts) {
         int integralIndex;
-        String s = equation;
         while ((integralIndex = s.indexOf(INTEGRAL_WORD)) != -1) {
             int endIndex = s.indexOf(")dx");
             String front = s.substring(0, integralIndex);
@@ -482,7 +523,7 @@ public class CustomView extends View {
         parts.add(s);
     }
 
-    private void parseIndefiniteDerivative() {
+    private ArrayList<String> parseIndefiniteDerivative(ArrayList<String> parts, String equation, boolean hasCalculus) {
         if (hasCalculus) {
             ArrayList<String> result = new ArrayList<>();
             for (String s : parts) {
@@ -493,6 +534,7 @@ public class CustomView extends View {
         } else {
             parts = parseDerivativeForEachPart(equation);
         }
+        return parts;
     }
 
     private ArrayList<String> parseDerivativeForEachPart(String s) {

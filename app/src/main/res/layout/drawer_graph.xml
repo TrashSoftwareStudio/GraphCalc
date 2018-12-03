@@ -9,18 +9,20 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/button_graph_ms"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
-            android:layout_height="match_parent"
-            android:text="@string/mSave"/>
+        <!--<Button-->
+            <!--android:id="@+id/button_graph_ms"-->
+            <!--android:layout_width="0dp"-->
+            <!--android:layout_weight="0.5"-->
+            <!--android:layout_height="match_parent"-->
+            <!--android:onClick="graphSave"-->
+            <!--android:text="@string/mSave"/>-->
 
         <Button
+            style="@style/NumberButton"
             android:id="@+id/button_graph_mc"
-            android:layout_width="0dp"
-            android:layout_weight="0.5"
+            android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:onClick="graphClear"
             android:text="@string/mClear"/>
 
     </LinearLayout>

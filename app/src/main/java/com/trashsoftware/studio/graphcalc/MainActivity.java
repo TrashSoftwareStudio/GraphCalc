@@ -1,9 +1,11 @@
 package com.trashsoftware.studio.graphcalc;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,6 +32,7 @@ import com.trashsoftware.studio.graphcalc.maths.Calculus;
 import com.trashsoftware.studio.graphcalc.maths.ExtendedExpressionBuilder;
 import com.trashsoftware.studio.graphcalc.maths.NumberTooLargeException;
 import com.trashsoftware.studio.graphcalc.util.GraphUnit;
+import com.trashsoftware.studio.graphcalc.util.SavedEquation;
 import com.trashsoftware.studio.graphcalc.util.Util;
 
 import net.objecthunter.exp4j.Expression;
@@ -84,6 +87,8 @@ public class MainActivity extends AppCompatActivity
 
     private Button msBtn, mrBtn, mcBtn;
 
+    private ArrayList<String> savedEquations;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -102,6 +107,16 @@ public class MainActivity extends AppCompatActivity
         }
     }
 
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if(requestCode == 1 && resultCode == Activity.RESULT_OK){
+//            DataType yourData = (DataType) data.getParcelableExtra("key");
+            //Do whatever you want with yourData
+            savedEquations = data.getStringArrayListExtra(GraphActivity.SAVED_EQUATIONS_KEY);
+        }
+    }
 
     @SuppressWarnings("StatementWithEmptyBody")
     @Override
@@ -110,7 +125,9 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_graph) {
-            drawGraphAction();
+            drawGraphAction(false);
+        } else if (id == R.id.nav_graph_polar) {
+            drawGraphAction(true);
         } else if (id == R.id.nav_settings) {
 
         }
@@ -229,11 +246,12 @@ public class MainActivity extends AppCompatActivity
         });
     }
 
-    private void drawGraphAction() {
-        GraphUnit gu = new GraphUnit(this, editText.getText().toString());
+    private void drawGraphAction(boolean polar) {
+        GraphUnit gu = new GraphUnit(this, editText.getText().toString(), polar);
         Intent intent = new Intent(this, GraphActivity.class);
         intent.putExtra(UNIT_KEY, gu);
-        startActivity(intent);
+        intent.putExtra(GraphActivity.SAVED_EQUATIONS_KEY, savedEquations);
+        startActivityForResult(intent, 1);
     }
 
     public void memorySave(View view) {
