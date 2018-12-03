@@ -18,7 +18,7 @@ public class MemoryAdapter extends RecyclerView.Adapter<MemoryAdapter.MemoryView
 
     private MainActivity activity;
 
-    static class MemoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class MemoryViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
         private TextView textView;
         private MainActivity activity;
@@ -43,6 +43,11 @@ public class MemoryAdapter extends RecyclerView.Adapter<MemoryAdapter.MemoryView
     public MemoryAdapter(MainActivity activity, ArrayList<String> dataSet) {
         this.dataSet = dataSet;
         this.activity = activity;
+    }
+
+    public boolean removeItem(MemoryViewHolder mvh) {
+        String text = mvh.textView.getText().toString();
+        return dataSet.remove(text);
     }
 
     @NonNull

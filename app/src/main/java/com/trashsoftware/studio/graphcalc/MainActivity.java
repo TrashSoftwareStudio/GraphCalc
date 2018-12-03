@@ -4,9 +4,11 @@ import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.TooltipCompat;
+import android.support.v7.widget.helper.ItemTouchHelper;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.View;
@@ -180,9 +182,28 @@ public class MainActivity extends AppCompatActivity
 
     private void initRecyclerView(ArrayList<String> strings) {
         RecyclerView memoryList = navigationView.getHeaderView(0).findViewById(R.id.memory_list);
-        memoryList.setLayoutManager(new LinearLayoutManager(this));
+        memoryList.setLayoutManager(new GridLayoutManager(this,1));
         memoryAdapter2 = new MemoryAdapter(this, strings);
         memoryList.setAdapter(memoryAdapter2);
+
+        ItemTouchHelper ith = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(0, ItemTouchHelper.RIGHT) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder viewHolder1) {
+                return false;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int i) {
+                if (memoryAdapter2.removeItem((MemoryAdapter.MemoryViewHolder) viewHolder)) {
+                    memoryAdapter2.notifyDataSetChanged();
+                    if (memoryAdapter2.dataSet.size() == 0) {
+                        mrBtn.setEnabled(false);
+                        mcBtn.setEnabled(false);
+                    }
+                }
+            }
+        });
+        ith.attachToRecyclerView(memoryList);
     }
 
     private void setNumber2Listener() {

@@ -60,9 +60,6 @@ public class CustomView extends View {
 
     private float heightCenter;
 
-    // 0 for axis, 1 for dotted line, 2 for curve
-//    int drawingType = 0;
-
     float scalar = 108;
 
     private float lastX;
@@ -264,10 +261,7 @@ public class CustomView extends View {
 
     private double[][] calculate() {
         double[][] points = new double[(int) screenWidth / interval][];
-//        System.out.println("succeed init arrays");
-
         if (hasCalculus) {
-//            System.out.println(parts);
             int index = 0;
             for (float screenX = 0; screenX < screenWidth; screenX += interval) {
                 double x = getNumberX(screenX);
@@ -284,7 +278,6 @@ public class CustomView extends View {
                 points[index++] = new double[]{x, y};
             }
         } else {
-//            System.out.println(equation);
             Expression ex = new ExtendedExpressionBuilder(equation).variable("x").build();
             int index = 0;
             for (float screenX = 0; screenX < screenWidth; screenX += interval) {
@@ -309,14 +302,6 @@ public class CustomView extends View {
 //        System.out.println("succeed3");
         return points;
     }
-
-//    private double calculateCalculus(double x) {
-//
-//    }
-//
-//    private String parse() {
-//
-//    }
 
     private double calculateIntegral(double x) {
         StringBuilder sb = new StringBuilder();
